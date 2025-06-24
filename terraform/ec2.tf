@@ -1,0 +1,30 @@
+
+resource "aws_key_pair" "deployer" {
+  key_name   = var.key_name
+  public_key = file(var.public_key_path)
+}
+
+resource "aws_instance" "app_server" {
+  ami           = data.aws_ami.amazon_linux_2.id
+  instance_type = "t2.micro"
+  key_name      = aws_key_pair.deployer.key_name
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo yum update -y",
+      "sudo yum install python3-pip -y",
+      "pip3 install fastapi uvicorn"
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ec2-user"
+      private_key = file("~/.ssh/id_rsa")
+      host        = self.public_ip
+    }
+  }
+
+  tags = {
+    Name = "fastapi-server"
+  }
+}
