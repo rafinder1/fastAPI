@@ -32,6 +32,8 @@ jobs:
   terraform:
     needs: test
     runs-on: ubuntu-latest
+    outputs:
+      ec2_ip: ${{ steps.set-ip.outputs.ec2_ip }}
 
     steps:
     - name: Checkout code
@@ -60,7 +62,7 @@ jobs:
 
     - name: Get EC2 IP
       id: set-ip
-      run: echo "app_server_public_ip=$(terraform output -raw app_server_public_ip)" >> $GITHUB_OUTPUT
+      run: echo "ec2_ip=$(terraform output -raw ec2_ip)" >> $GITHUB_OUTPUT
 
   deploy:
     needs: terraform
