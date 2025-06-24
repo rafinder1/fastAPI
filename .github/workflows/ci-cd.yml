@@ -63,24 +63,24 @@ jobs:
       working-directory: ./terraform
       run: echo "::set-output name=ec2_ip::$(terraform output -raw app_server_public_ip)"
 
-#  deploy:
-#    needs: terraform
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#    - name: Checkout code
-#      uses: actions/checkout@v3
-#
-#    - name: Set up SSH
-#      run: |
-#        mkdir -p ~/.ssh
-#        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-#        chmod 600 ~/.ssh/id_rsa
-#
-#    - name: Deploy app to EC2
-#      run: |
-#        scp -o StrictHostKeyChecking=no -r app ec2-user@${{ needs.terraform.outputs.ec2_ip }}:/home/ec2-user/
-#        ssh -o StrictHostKeyChecking=no ec2-user@${{ needs.terraform.outputs.ec2_ip }} << 'EOF'
-#          pip3 install fastapi uvicorn
-#          nohup uvicorn app.main:app --host 0.0.0.0 --port 80 &
-#        EOF
+  deploy:
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: Deploy app to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -r app ec2-user@${{ needs.terraform.outputs.ec2_ip }}:/home/ec2-user/
+        ssh -o StrictHostKeyChecking=no ec2-user@${{ needs.terraform.outputs.ec2_ip }} << 'EOF'
+          pip3 install fastapi uvicorn
+          nohup uvicorn app.main:app --host 0.0.0.0 --port 80 &
+        EOF
