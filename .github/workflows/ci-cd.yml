@@ -47,6 +47,9 @@ jobs:
         echo "${{ secrets.EC2_PUBLIC_KEY }}" > ~/.ssh/id_rsa.pub
         chmod 600 ~/.ssh/id_rsa
 
+    - name: Terraform Destroy (clean up)
+      run: terraform destroy -auto-approve
+
     - name: Terraform Init
       working-directory: ./terraform
       run: terraform init
