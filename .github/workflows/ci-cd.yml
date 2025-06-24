@@ -62,6 +62,7 @@ jobs:
 
     - name: Get EC2 IP
       id: set-ip
+      working-directory: ./terraform
       run: echo "ec2_ip=$(terraform output -raw ec2_ip)" >> $GITHUB_OUTPUT
 
   deploy:
